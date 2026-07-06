@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <%- include('partials/nav') %>
+
+  <main class="main-content">
+
+<article class="post-detail" data-animate="fade-up">
+  <div class="post-detail-header">
+    <div class="post-detail-tags">
+      <% if (post.tags) { post.tags.split(',').forEach(tag => { %>
+        <span class="post-tag"><%= tag.trim() %></span>
+      <% })} %>
+    </div>
+    <h1 class="post-detail-title"><%= post.title %></h1>
+    <div class="post-detail-meta">
+      <span>发布于 <%= new Date(post.created_at).toLocaleString('zh-CN') %></span>
+      <% if (post.updated_at !== post.created_at) { %>
+        <span> · 更新于 <%= new Date(post.updated_at).toLocaleString('zh-CN') %></span>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="post-detail-body markdown-body">
+    <%- marked.parse(post.content) %>
+  </div>
+
+  <div class="post-detail-footer">
+    <a href="/blog" class="back-link">&#x2190; 返回博客列表</a>
+  </div>
+</article>
+
+  <%- include('partials/footer') %>

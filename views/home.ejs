@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <%- include('partials/nav', { currentPage: 'home' }) %>
+
+  <main class="main-content">
+<%
+const pad = n => n.toString().padStart(2, '0');
+%>
+
+<div class="hero">
+  <div class="hero-bg-text" id="heroBgText">KYAI</div>
+  <div class="hero-content">
+    <h1 class="hero-title" data-split>
+      <span class="hero-word" style="--i:0">考研</span>
+      <span class="hero-word" style="--i:1">个人</span>
+      <span class="hero-word" style="--i:2">空间站</span>
+    </h1>
+    <p class="hero-subtitle" data-animate="fade-up" style="--delay:0.8s">
+      <span class="subtle-blink">&#x258C;</span> 非线性思维 / 高效备考 / 数据驱动
+    </p>
+  </div>
+
+  <div class="countdown-section" data-animate="fade-up" style="--delay:1.2s">
+    <% exams.forEach(exam => {
+      const target = new Date(exam.exam_date);
+      const now = new Date();
+      const diff = Math.max(0, target - now);
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    %>
+    <div class="countdown-card" style="--accent:<%= exam.color %>">
+      <div class="countdown-header">
+        <span class="countdown-dot" style="background:<%= exam.color %>"></span>
+        <%= exam.exam_name %>
+      </div>
+      <div class="countdown-digits">
+        <div class="digit-block">
+          <span class="digit-value" id="cd-days"><%= pad(days) %></span>
+          <span class="digit-label">天</span>
+        </div>
+        <span class="digit-sep">:</span>
+        <div class="digit-block">
+          <span class="digit-value" id="cd-hours"><%= pad(hours) %></span>
+          <span class="digit-label">时</span>
+        </div>
+        <span class="digit-sep">:</span>
+        <div class="digit-block">
+          <span class="digit-value" id="cd-mins"><%= pad(minutes) %></span>
+          <span class="digit-label">分</span>
+        </div>
+        <span class="digit-sep">:</span>
+        <div class="digit-block">
+          <span class="digit-value" id="cd-secs"><%= pad(seconds) %></span>
+          <span class="digit-label">秒</span>
+        </div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+</div>
+
+<section class="section" data-animate="fade-up" style="--delay:0.3s">
+  <h2 class="section-title">
+    <span class="section-hash">#</span> 学习进度
+    <span class="section-line"></span>
+  </h2>
+  <div class="milestones-grid">
+    <% milestones.forEach(m => { %>
+    <div class="milestone-card" data-milestone style="--accent:<%= m.color %>">
+      <div class="milestone-info">
+        <span class="milestone-label"><%= m.title %></span>
+        <span class="milestone-pct"><%= m.progress %>%</span>
+      </div>
+      <div class="milestone-bar-track">
+        <div class="milestone-bar-fill" style="width:0%;--width:<%= (m.progress / m.target * 100).toFixed(1) %>%" data-progress="<%= m.progress %>" data-target="<%= m.target %>"></div>
+      </div>
+      <div class="milestone-target">目标: <%= m.target %></div>
+    </div>
+    <% }) %>
+  </div>
+</section>
+
+<section class="section" data-animate="fade-up" style="--delay:0.5s">
+  <h2 class="section-title">
+    <span class="section-hash">#</span> 任务看板
+    <span class="section-line"></span>
+  </h2>
+  <div class="kanban-grid">
+    <% const subjects = [...new Set(todos.map(t => t.subject))];
+       subjects.forEach(sub => {
+         const items = todos.filter(t => t.subject === sub);
+         const done = parseInt(items[0]?.done || 0);
+         const total = parseInt(items[0]?.total || 0);
+    %>
+    <div class="kanban-col">
+      <div class="kanban-header"><%= sub %></div>
+      <div class="kanban-count">
+        <span class="kanban-done"><%= done || 0 %></span>/<span class="kanban-total"><%= total || 0 %></span>
+      </div>
+      <div class="kanban-mini-bar">
+        <div class="kanban-mini-fill" style="--w:<%= total > 0 ? (done/total*100).toFixed(0) : 0 %>%"></div>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+</section>
+
+<section class="section" data-animate="fade-up" style="--delay:0.7s">
+  <h2 class="section-title">
+    <span class="section-hash">#</span> 最新文章
+    <span class="section-line"></span>
+  </h2>
+  <div class="posts-grid">
+    <% recentPosts.forEach(post => { %>
+    <a href="/blog/<%= post.slug %>" class="post-card">
+      <div class="post-card-tags">
+        <% if (post.tags) { post.tags.split(',').forEach(tag => { %>
+          <span class="post-tag"><%= tag.trim() %></span>
+        <% })} %>
+      </div>
+      <h3 class="post-card-title"><%= post.title %></h3>
+      <p class="post-card-excerpt"><%= post.excerpt || post.content.substring(0, 100) %></p>
+      <span class="post-card-date"><%= new Date(post.created_at).toLocaleDateString('zh-CN') %></span>
+    </a>
+    <% }) %>
+  </div>
+</section>
+
+<script>
+  const examDate = new Date('<%= exams[0] ? exams[0].exam_date : "2026-12-26" %>').getTime();
+</script>
+
+  <%- include('partials/footer') %>
