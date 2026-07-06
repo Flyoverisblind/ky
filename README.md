@@ -89,3 +89,5 @@ kyai/
 ## 自定义
 
 编辑 `db.js` 中的种子数据可修改初始内容。考试日期在 `db.js` 的 `exam_dates` 表中修改。
+<img width="1910" height="873" alt="image" src="https://github.com/user-attachments/assets/efae8bd2-5078-4b83-a58f-82854f081bc0" />
+
