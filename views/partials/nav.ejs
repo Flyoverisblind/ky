@@ -1,20 +1,13 @@
 <nav class="navbar">
   <div class="nav-inner">
     <a href="/" class="nav-brand">
-      <span class="brand-icon">&#x29D7;</span>
-      <span class="brand-text">Kyai</span>
+      <span class="brand-seal">研</span>
     </a>
     <div class="nav-links">
       <% const cp = typeof currentPage !== 'undefined' ? currentPage : ''; %>
-      <a href="/" class="nav-link <%= cp === 'home' ? 'nav-link-active' : '' %>">
-        <span class="nav-label">首页</span><span class="nav-bracket">[01]</span>
-      </a>
-      <a href="/blog" class="nav-link <%= cp === 'blog' ? 'nav-link-active' : '' %>">
-        <span class="nav-label">博客</span><span class="nav-bracket">[02]</span>
-      </a>
-      <a href="/admin" class="nav-link <%= cp === 'admin' ? 'nav-link-active' : '' %>">
-        <span class="nav-label">控制台</span><span class="nav-bracket">[03]</span>
-      </a>
+      <a href="/" class="nav-link <%= cp === 'home' ? 'nav-link-active' : '' %>">首页</a>
+      <a href="/blog" class="nav-link <%= cp === 'blog' ? 'nav-link-active' : '' %>">文章</a>
+      <a href="/admin" class="nav-link <%= cp === 'admin' ? 'nav-link-active' : '' %>">笔耕</a>
     </div>
     <button class="nav-toggle" id="themeToggle">
       <span class="toggle-icon">&#x25D0;</span>

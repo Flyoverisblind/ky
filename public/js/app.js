@@ -1,25 +1,28 @@
 /* ========================================
    Kyai — Main Application JS
-   Non-linear animations with anime.js
+   水墨风格 · 非线性动画 · anime.js
    ======================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initParticles();
+  initInkCanvas();
   initCountdown();
   initScrollAnimations();
   initNavScroll();
   initMouseTracking();
   initAnimeSequences();
+  initSealStamps();
+  initBackToTop();
+  initKeyboardShortcuts();
+  injectReadingTime();
 });
 
-// ─── Canvas Particle Background ─────────────────────
-function initParticles() {
+// ─── Ink Wash Canvas Background ─────────────────────
+function initInkCanvas() {
   const canvas = document.getElementById('bg');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let particles = [];
+  let inkDrops = [];
   let animFrame;
-  let mouse = { x: 0, y: 0 };
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -28,74 +31,49 @@ function initParticles() {
   resize();
   window.addEventListener('resize', () => {
     resize();
-    particles = createParticles();
+    inkDrops = createDrops();
   });
 
-  document.addEventListener('mousemove', (e) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-  });
-
-  function createParticles() {
-    const count = Math.min(80, Math.floor((canvas.width * canvas.height) / 12000));
+  function createDrops() {
+    const count = 12;
     const arr = [];
     for (let i = 0; i < count; i++) {
       arr.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        size: Math.random() * 2 + 0.5,
-        alpha: Math.random() * 0.4 + 0.1,
+        r: Math.random() * 120 + 40,
+        alpha: Math.random() * 0.025 + 0.008,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.12,
+        hue: Math.random() < 0.3 ? 5 : Math.random() < 0.4 ? 40 : 210,
       });
     }
     return arr;
   }
-  particles = createParticles();
+  inkDrops = createDrops();
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const isLight = document.body.classList.contains('light');
-    const pColor = isLight ? 'rgba(0, 102, 255, ' : 'rgba(0, 240, 255, ';
-    const lColor = isLight ? 'rgba(0, 102, 255, ' : 'rgba(0, 240, 255, ';
 
-    particles.forEach((p) => {
-      p.x += p.vx;
-      p.y += p.vy;
+    inkDrops.forEach((drop) => {
+      drop.x += drop.vx;
+      drop.y += drop.vy;
 
-      if (p.x < 0) p.x = canvas.width;
-      if (p.x > canvas.width) p.x = 0;
-      if (p.y < 0) p.y = canvas.height;
-      if (p.y > canvas.height) p.y = 0;
+      if (drop.x < -drop.r) drop.x = canvas.width + drop.r;
+      if (drop.x > canvas.width + drop.r) drop.x = -drop.r;
+      if (drop.y < -drop.r) drop.y = canvas.height + drop.r;
+      if (drop.y > canvas.height + drop.r) drop.y = -drop.r;
 
-      const dx = mouse.x - p.x;
-      const dy = mouse.y - p.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const maxDist = 200;
-      const force = Math.max(0, 1 - dist / maxDist);
+      const gradient = ctx.createRadialGradient(drop.x, drop.y, 0, drop.x, drop.y, drop.r);
+      gradient.addColorStop(0, `hsla(${drop.hue}, 30%, 50%, ${drop.alpha * 2})`);
+      gradient.addColorStop(0.5, `hsla(${drop.hue}, 20%, 50%, ${drop.alpha})`);
+      gradient.addColorStop(1, 'transparent');
 
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size + force * 1.5, 0, Math.PI * 2);
-      ctx.fillStyle = `${pColor}${p.alpha + force * 0.3})`;
+      ctx.arc(drop.x, drop.y, drop.r, 0, Math.PI * 2);
+      ctx.fillStyle = gradient;
       ctx.fill();
     });
-
-    // Draw connections
-    for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 120) {
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `${lColor}${0.06 * (1 - dist / 120)})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
-        }
-      }
-    }
 
     animFrame = requestAnimationFrame(draw);
   }
@@ -108,8 +86,8 @@ function initCountdown() {
   const hoursEl = document.getElementById('cd-hours');
   const minsEl = document.getElementById('cd-mins');
   const secsEl = document.getElementById('cd-secs');
-
   if (!daysEl || !hoursEl || !minsEl || !secsEl) return;
+
   const pad = (n) => n.toString().padStart(2, '0');
 
   function update() {
@@ -125,10 +103,10 @@ function initCountdown() {
       if (el.textContent !== newValues[i]) {
         anime({
           targets: el,
-          scale: [1.4, 1],
+          scale: [1.3, 1],
           opacity: [0, 1],
-          duration: 600,
-          easing: 'easeOutElastic(1, .4)',
+          duration: 700,
+          easing: 'easeOutElastic(1, .35)',
           begin: () => { el.textContent = newValues[i]; }
         });
       }
@@ -145,42 +123,30 @@ function initScrollAnimations() {
       if (entry.isIntersecting) {
         entry.target.classList.add('animated');
 
-        // Animate milestone bars
         if (entry.target.dataset.milestone !== undefined) {
           const bar = entry.target.querySelector('.milestone-bar-fill');
           if (bar) {
             const targetWidth = bar.style.getPropertyValue('--width');
             setTimeout(() => {
-              anime({
-                targets: bar,
-                width: targetWidth,
-                duration: 1800,
-                easing: 'easeOutElastic(1, .6)',
-              });
-            }, 200);
+              anime({ targets: bar, width: targetWidth, duration: 2000, easing: 'easeOutElastic(1, .5)' });
+            }, 300);
           }
         }
 
-        // Animate kanban fill bars
         if (entry.target.classList.contains('kanban-col')) {
           const fill = entry.target.querySelector('.kanban-mini-fill');
           if (fill) {
             const w = fill.style.getPropertyValue('--w');
             setTimeout(() => {
-              anime({
-                targets: fill,
-                width: w,
-                duration: 1600,
-                easing: 'easeOutElastic(1, .5)',
-              });
-            }, 200);
+              anime({ targets: fill, width: w, duration: 1800, easing: 'easeOutElastic(1, .4)' });
+            }, 300);
           }
         }
 
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15 });
+  }, { threshold: 0.12 });
 
   document.querySelectorAll('[data-milestone], .kanban-col, [data-animate]').forEach(el => {
     observer.observe(el);
@@ -198,6 +164,9 @@ function initNavScroll() {
     if (!ticking) {
       requestAnimationFrame(() => {
         const current = window.scrollY;
+        if (current > 80) navbar.classList.add('scrolled');
+        else navbar.classList.remove('scrolled');
+
         if (current > 80 && current > lastScroll + 10) {
           navbar.classList.add('nav-hidden');
         } else if (current < lastScroll - 10) {
@@ -211,7 +180,7 @@ function initNavScroll() {
   });
 }
 
-// ─── Mouse Position Tracking ────────────────────────
+// ─── Mouse Tracking on Cards ───────────────────────
 function initMouseTracking() {
   document.querySelectorAll('.post-card').forEach(card => {
     card.addEventListener('mousemove', (e) => {
@@ -220,39 +189,35 @@ function initMouseTracking() {
       const y = ((e.clientY - rect.top) / rect.height) * 100;
       card.style.setProperty('--mouse-x', x + '%');
       card.style.setProperty('--mouse-y', y + '%');
-      card.style.setProperty('--mouse-active', '1');
-    });
-    card.addEventListener('mouseleave', () => {
-      card.style.removeProperty('--mouse-active');
     });
   });
 }
 
-// ─── Anime.js Sequence Animations ───────────────────
+// ─── Anime.js Entrance Sequences ───────────────────
 function initAnimeSequences() {
-  // Stagger entrance for post cards
+  // Post cards stagger
   const cards = document.querySelectorAll('.post-card');
   if (cards.length) {
     anime({
       targets: cards,
-      translateY: [40, 0],
+      translateY: [60, 0],
       opacity: [0, 1],
-      delay: anime.stagger(80, { start: 300 }),
-      duration: 800,
+      delay: anime.stagger(100, { start: 200 }),
+      duration: 900,
       easing: 'easeOutExpo',
     });
   }
 
-  // Milestone cards entrance stagger
+  // Milestone cards stagger
   const mCards = document.querySelectorAll('.milestone-card');
   if (mCards.length) {
     anime({
       targets: mCards,
-      translateY: [30, 0],
+      translateY: [40, 0],
       opacity: [0, 1],
-      delay: anime.stagger(100, { start: 400 }),
-      duration: 700,
-      easing: 'easeOutBack(1.5)',
+      delay: anime.stagger(120, { start: 300 }),
+      duration: 800,
+      easing: 'easeOutBack(1.3)',
     });
   }
 
@@ -261,25 +226,153 @@ function initAnimeSequences() {
   if (kCols.length) {
     anime({
       targets: kCols,
-      scale: [0.8, 1],
+      scale: [0.85, 1],
       opacity: [0, 1],
-      delay: anime.stagger(80, { start: 500 }),
-      duration: 600,
-      easing: 'easeOutElastic(1, .5)',
+      delay: anime.stagger(100, { start: 400 }),
+      duration: 700,
+      easing: 'easeOutElastic(1, .45)',
     });
   }
 
-  // Hero background text subtle animation
-  const heroBg = document.getElementById('heroBgText');
-  if (heroBg) {
+  // Section titles underline expand
+  document.querySelectorAll('.section-line').forEach((line, i) => {
+    const parent = line.parentElement;
+    if (!parent) return;
     anime({
-      targets: heroBg,
-      opacity: [0, 0.015],
-      scale: [1.1, 1],
-      duration: 2000,
+      targets: line,
+      scaleX: [0, 1],
+      duration: 1000,
+      delay: 600 + i * 200,
       easing: 'easeOutExpo',
     });
-  }
+  });
+}
+
+// ─── Seal Stamp Decoration ─────────────────────────
+function initSealStamps() {
+  // Add tiny floating seal marks to hero area
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+
+  const seals = hero.querySelectorAll('.ornament-diamond');
+  seals.forEach((s, i) => {
+    anime({
+      targets: s,
+      rotate: [45, 45 + 360],
+      duration: 8000,
+      delay: i * 2000,
+      loop: true,
+      easing: 'linear',
+    });
+  });
+}
+
+// ─── Countdown Section Entrance ────────────────────
+(function countdownEntrance() {
+  const cd = document.querySelector('.countdown-card');
+  if (!cd) return;
+
+  anime({
+    targets: cd,
+    scale: [0.9, 1],
+    opacity: [0, 1],
+    duration: 1000,
+    delay: 1400,
+    easing: 'easeOutElastic(1, .5)',
+  });
+})();
+
+// ─── Back to Top Button ─────────────────────────────
+function initBackToTop() {
+  const btn = document.createElement('button');
+  btn.className = 'back-to-top';
+  btn.setAttribute('aria-label', '回到顶部');
+  btn.innerHTML = '<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20"/></svg><span class="top-arrow">&#x2191;</span>';
+  document.body.appendChild(btn);
+
+  const circle = btn.querySelector('circle');
+  const circumference = 2 * Math.PI * 20; // ~125.66
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+
+        if (scrollTop > 400) btn.classList.add('visible');
+        else btn.classList.remove('visible');
+
+        if (circle) {
+          circle.style.strokeDasharray = circumference;
+          circle.style.strokeDashoffset = circumference * (1 - progress);
+        }
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+// ─── Keyboard Shortcuts ─────────────────────────────
+function initKeyboardShortcuts() {
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+    switch (e.key) {
+      case 'g':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          window.location.href = '/';
+        }
+        break;
+      case 'b':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          window.location.href = '/blog';
+        }
+        break;
+      case 'a':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          window.location.href = '/admin';
+        }
+        break;
+      case 't':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          document.getElementById('themeToggle')?.click();
+        }
+        break;
+      case 'Escape':
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        break;
+    }
+  });
+}
+
+// ─── Reading Time ──────────────────────────────────
+function injectReadingTime() {
+  const body = document.querySelector('.markdown-body');
+  const meta = document.querySelector('.post-detail-meta');
+  if (!body || !meta) return;
+
+  const text = body.textContent || '';
+  const wordCount = text.replace(/\s+/g, '').length;
+  const minutes = Math.max(1, Math.ceil(wordCount / 400));
+
+  const span = document.createElement('span');
+  span.className = 'reading-time';
+  span.innerHTML = `&#x23F1; ${minutes} 分钟阅读`;
+  meta.appendChild(span);
 }
 
 // ─── Theme Toggle ───────────────────────────────────
@@ -289,21 +382,21 @@ function initAnimeSequences() {
   if (!toggle) return;
 
   const saved = localStorage.getItem('kyai-theme');
-  if (saved === 'light') {
-    document.body.classList.add('light');
+  if (saved === 'dark') {
+    document.body.classList.add('dark');
     if (icon) icon.innerHTML = '&#x25D1;';
   }
 
   toggle.addEventListener('click', () => {
-    const isLight = document.body.classList.toggle('light');
-    localStorage.setItem('kyai-theme', isLight ? 'light' : 'dark');
+    const isDark = document.body.classList.toggle('dark');
+    localStorage.setItem('kyai-theme', isDark ? 'dark' : 'light');
     anime({
       targets: icon,
       rotate: [0, 360],
       duration: 600,
       easing: 'easeInOutExpo',
       complete: () => {
-        icon.innerHTML = isLight ? '&#x25D1;' : '&#x25D0;';
+        icon.innerHTML = isDark ? '&#x25D1;' : '&#x25D0;';
       }
     });
   });

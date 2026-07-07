@@ -18,9 +18,9 @@
     </div>
     <h1 class="post-detail-title"><%= post.title %></h1>
     <div class="post-detail-meta">
-      <span>发布于 <%= new Date(post.created_at).toLocaleString('zh-CN') %></span>
+      <span>撰于 <%= new Date(post.created_at).toLocaleString('zh-CN') %></span>
       <% if (post.updated_at !== post.created_at) { %>
-        <span> · 更新于 <%= new Date(post.updated_at).toLocaleString('zh-CN') %></span>
+        <span> · 修于 <%= new Date(post.updated_at).toLocaleString('zh-CN') %></span>
       <% } %>
     </div>
   </div>
@@ -30,7 +30,7 @@
   </div>
 
   <div class="post-detail-footer">
-    <a href="/blog" class="back-link">&#x2190; 返回博客列表</a>
+    <a href="/blog" class="back-link">&#x2190; 返回文章列表</a>
   </div>
 </article>
 

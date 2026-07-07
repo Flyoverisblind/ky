@@ -11,17 +11,25 @@
 
 <div class="page-header" data-animate="fade-up">
   <h1 class="page-title">
-    <span class="section-hash">#</span> 博客
-    <span class="subtle-blink">&#x258C;</span>
+    <span class="section-seal">文章</span>
   </h1>
-  <p class="page-desc">用 Markdown 记录考研路上的每一寸思考</p>
+  <p class="page-desc">以笔墨记录考研路上的寸进之功</p>
 </div>
 
-<div class="posts-grid-full" data-animate="fade-up" style="--delay:0.2s">
+<% if (tags && tags.length > 0) { %>
+<div class="tag-cloud" data-animate="fade-up" style="--delay:0.1s">
+  <a href="/blog" class="<%= activeTag === '' ? 'active' : '' %>">全部</a>
+  <% tags.forEach(t => { %>
+    <a href="/blog?tag=<%= encodeURIComponent(t.name) %>" class="<%= activeTag === t.name ? 'active' : '' %>"><%= t.name %></a>
+  <% }) %>
+</div>
+<% } %>
+
+<div class="posts-grid-full" data-animate="fade-up" style="--delay:0.15s">
   <% if (posts.length === 0) { %>
     <div class="empty-state">
-      <div class="empty-icon">&#x29D7;</div>
-      <p>还没有文章，去控制台写一篇吧</p>
+      <div class="empty-icon">&#x270D;</div>
+      <p>尚无文章，去笔耕处写一篇</p>
     </div>
   <% } %>
 
@@ -43,15 +51,15 @@
 </div>
 
 <% if (totalPages > 1) { %>
-<div class="pagination" data-animate="fade-up" style="--delay:0.4s">
+<div class="pagination" data-animate="fade-up" style="--delay:0.3s">
   <% if (currentPage > 1) { %>
-    <a href="/blog?page=<%= currentPage - 1 %>" class="page-btn">&#x2190; 上一页</a>
+    <a href="/blog?page=<%= currentPage - 1 %>" class="page-btn">&#x2190; 前页</a>
   <% } %>
   <% for (let i = 1; i <= totalPages; i++) { %>
     <a href="/blog?page=<%= i %>" class="page-btn <%= i === currentPage ? 'page-btn-active' : '' %>"><%= i %></a>
   <% } %>
   <% if (currentPage < totalPages) { %>
-    <a href="/blog?page=<%= currentPage + 1 %>" class="page-btn">下一页 &#x2192;</a>
+    <a href="/blog?page=<%= currentPage + 1 %>" class="page-btn">后页 &#x2192;</a>
   <% } %>
 </div>
 <% } %>

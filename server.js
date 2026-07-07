@@ -37,12 +37,33 @@ app.get('/', (req, res) => {
 
 app.get('/blog', (req, res) => {
   const page = Math.max(1, parseInt(req.query.page) || 1);
+  const tag = req.query.tag || '';
   const limit = 6;
   const offset = (page - 1) * limit;
-  const total = db.prepare('SELECT COUNT(*) as count FROM posts').get().count;
-  const posts = db.prepare('SELECT * FROM posts ORDER BY created_at DESC LIMIT ? OFFSET ?').all(limit, offset);
+
+  let total, posts;
+  if (tag) {
+    total = db.prepare("SELECT COUNT(*) as count FROM posts WHERE INSTR(tags, ?) > 0").get(tag).count;
+    posts = db.prepare("SELECT * FROM posts WHERE INSTR(tags, ?) > 0 ORDER BY created_at DESC LIMIT ? OFFSET ?").all(tag, limit, offset);
+  } else {
+    total = db.prepare('SELECT COUNT(*) as count FROM posts').get().count;
+    posts = db.prepare('SELECT * FROM posts ORDER BY created_at DESC LIMIT ? OFFSET ?').all(limit, offset);
+  }
   const totalPages = Math.ceil(total / limit);
-  res.render('blog', { posts, currentPage: page, totalPages });
+
+  // Compute tag cloud
+  const allRows = db.prepare("SELECT tags FROM posts").all();
+  const tagCounts = {};
+  allRows.forEach(row => {
+    if (!row.tags) return;
+    row.tags.split(',').forEach(t => {
+      const trimmed = t.trim();
+      if (trimmed) tagCounts[trimmed] = (tagCounts[trimmed] || 0) + 1;
+    });
+  });
+  const tagsArr = Object.entries(tagCounts).map(([name, count]) => ({ name, count }));
+
+  res.render('blog', { posts, currentPage: page, totalPages, tags: tagsArr, activeTag: tag });
 });
 
 app.get('/blog/:slug', (req, res) => {

@@ -13,19 +13,24 @@ const pad = n => n.toString().padStart(2, '0');
 %>
 
 <div class="hero">
-  <div class="hero-bg-text" id="heroBgText">KYAI</div>
+  <div class="hero-ornament">
+    <span class="ornament-line"></span>
+    <span class="ornament-diamond"></span>
+    <span class="ornament-line"></span>
+  </div>
   <div class="hero-content">
-    <h1 class="hero-title" data-split>
-      <span class="hero-word" style="--i:0">考研</span>
-      <span class="hero-word" style="--i:1">个人</span>
-      <span class="hero-word" style="--i:2">空间站</span>
+    <h1 class="hero-title">
+      <span class="hero-char" style="--i:0">考</span>
+      <span class="hero-char" style="--i:1">研</span>
+      <span class="hero-char" style="--i:2">笔</span>
+      <span class="hero-char" style="--i:3">记</span>
     </h1>
-    <p class="hero-subtitle" data-animate="fade-up" style="--delay:0.8s">
-      <span class="subtle-blink">&#x258C;</span> 非线性思维 / 高效备考 / 数据驱动
+    <p class="hero-subtitle" data-animate="fade-up" style="--delay:1.2s">
+      格物致知 · 知行合一
     </p>
   </div>
 
-  <div class="countdown-section" data-animate="fade-up" style="--delay:1.2s">
+  <div class="countdown-section" data-animate="fade-up" style="--delay:1.6s">
     <% exams.forEach(exam => {
       const target = new Date(exam.exam_date);
       const now = new Date();
@@ -35,15 +40,15 @@ const pad = n => n.toString().padStart(2, '0');
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
     %>
-    <div class="countdown-card" style="--accent:<%= exam.color %>">
+    <div class="countdown-card">
       <div class="countdown-header">
-        <span class="countdown-dot" style="background:<%= exam.color %>"></span>
-        <%= exam.exam_name %>
+        <span class="countdown-dot"></span>
+        距离<%= exam.exam_name %>
       </div>
       <div class="countdown-digits">
         <div class="digit-block">
           <span class="digit-value" id="cd-days"><%= pad(days) %></span>
-          <span class="digit-label">天</span>
+          <span class="digit-label">日</span>
         </div>
         <span class="digit-sep">:</span>
         <div class="digit-block">
@@ -66,9 +71,10 @@ const pad = n => n.toString().padStart(2, '0');
   </div>
 </div>
 
-<section class="section" data-animate="fade-up" style="--delay:0.3s">
+<section class="section" data-animate="fade-up" style="--delay:0.2s">
   <h2 class="section-title">
-    <span class="section-hash">#</span> 学习进度
+    <span class="section-seal">进度</span>
+    学习进度的
     <span class="section-line"></span>
   </h2>
   <div class="milestones-grid">
@@ -87,9 +93,10 @@ const pad = n => n.toString().padStart(2, '0');
   </div>
 </section>
 
-<section class="section" data-animate="fade-up" style="--delay:0.5s">
+<section class="section" data-animate="fade-up" style="--delay:0.35s">
   <h2 class="section-title">
-    <span class="section-hash">#</span> 任务看板
+    <span class="section-seal">课业</span>
+    各科任务的
     <span class="section-line"></span>
   </h2>
   <div class="kanban-grid">
@@ -112,9 +119,10 @@ const pad = n => n.toString().padStart(2, '0');
   </div>
 </section>
 
-<section class="section" data-animate="fade-up" style="--delay:0.7s">
+<section class="section" data-animate="fade-up" style="--delay:0.5s">
   <h2 class="section-title">
-    <span class="section-hash">#</span> 最新文章
+    <span class="section-seal">随笔</span>
+    最新文章
     <span class="section-line"></span>
   </h2>
   <div class="posts-grid">
