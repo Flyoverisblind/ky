@@ -22,8 +22,8 @@
 ## 快速开始
 
 ```bash
-git clone https://github.com/你的用户名/kyai.git
-cd kyai
+git clone https://github.com/Flyoverisblind/ky.git
+cd ky
 npm install
 npm start
 ```
@@ -33,7 +33,7 @@ npm start
 ## 项目结构
 
 ```
-kyai/
+ky/
 ├── server.js                # Express 入口，路由 + API
 ├── db.js                    # SQLite 初始化 + 种子数据
 ├── package.json
