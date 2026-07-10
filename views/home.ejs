@@ -73,54 +73,6 @@ const pad = n => n.toString().padStart(2, '0');
 
 <section class="section" data-animate="fade-up" style="--delay:0.2s">
   <h2 class="section-title">
-    <span class="section-seal">进度</span>
-    学习进度的
-    <span class="section-line"></span>
-  </h2>
-  <div class="milestones-grid">
-    <% milestones.forEach(m => { %>
-    <div class="milestone-card" data-milestone style="--accent:<%= m.color %>">
-      <div class="milestone-info">
-        <span class="milestone-label"><%= m.title %></span>
-        <span class="milestone-pct"><%= m.progress %>%</span>
-      </div>
-      <div class="milestone-bar-track">
-        <div class="milestone-bar-fill" style="width:0%;--width:<%= (m.progress / m.target * 100).toFixed(1) %>%" data-progress="<%= m.progress %>" data-target="<%= m.target %>"></div>
-      </div>
-      <div class="milestone-target">目标: <%= m.target %></div>
-    </div>
-    <% }) %>
-  </div>
-</section>
-
-<section class="section" data-animate="fade-up" style="--delay:0.35s">
-  <h2 class="section-title">
-    <span class="section-seal">课业</span>
-    各科任务的
-    <span class="section-line"></span>
-  </h2>
-  <div class="kanban-grid">
-    <% const subjects = [...new Set(todos.map(t => t.subject))];
-       subjects.forEach(sub => {
-         const items = todos.filter(t => t.subject === sub);
-         const done = parseInt(items[0]?.done || 0);
-         const total = parseInt(items[0]?.total || 0);
-    %>
-    <div class="kanban-col">
-      <div class="kanban-header"><%= sub %></div>
-      <div class="kanban-count">
-        <span class="kanban-done"><%= done || 0 %></span>/<span class="kanban-total"><%= total || 0 %></span>
-      </div>
-      <div class="kanban-mini-bar">
-        <div class="kanban-mini-fill" style="--w:<%= total > 0 ? (done/total*100).toFixed(0) : 0 %>%"></div>
-      </div>
-    </div>
-    <% }) %>
-  </div>
-</section>
-
-<section class="section" data-animate="fade-up" style="--delay:0.5s">
-  <h2 class="section-title">
     <span class="section-seal">随笔</span>
     最新文章
     <span class="section-line"></span>

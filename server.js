@@ -28,11 +28,9 @@ app.use('/api/milestones', milestonesRouter);
 // ==================== Frontend Routes ====================
 
 app.get('/', (req, res) => {
-  const milestones = db.prepare('SELECT * FROM milestones ORDER BY created_at ASC').all();
   const exams = db.prepare('SELECT * FROM exam_dates ORDER BY exam_date ASC').all();
-  const todos = db.prepare('SELECT subject, COUNT(*) as total, SUM(completed) as done FROM todos GROUP BY subject').all();
   const recentPosts = db.prepare('SELECT * FROM posts ORDER BY created_at DESC LIMIT 3').all();
-  res.render('home', { milestones, exams, todos, recentPosts });
+  res.render('home', { exams, recentPosts });
 });
 
 app.get('/blog', (req, res) => {
