@@ -72,9 +72,7 @@ app.get('/blog/:slug', (req, res) => {
 
 app.get('/admin', (req, res) => {
   const posts = db.prepare('SELECT * FROM posts ORDER BY created_at DESC').all();
-  const todos = db.prepare('SELECT * FROM todos ORDER BY created_at DESC').all();
-  const milestones = db.prepare('SELECT * FROM milestones ORDER BY created_at ASC').all();
-  res.render('admin', { posts, todos, milestones });
+  res.render('admin', { posts });
 });
 
 // 404

@@ -16,134 +16,46 @@
     </h1>
   </div>
 
-  <div class="admin-tabs">
-    <button class="admin-tab active" data-tab="posts">文章管理</button>
-    <button class="admin-tab" data-tab="todos">任务管理</button>
-    <button class="admin-tab" data-tab="milestones">进度管理</button>
+  <div class="admin-toolbar">
+    <button class="btn btn-primary" id="newPostBtn">+ 新建文章</button>
   </div>
 
-  <!-- Posts Panel -->
-  <div class="admin-panel active" data-panel="posts">
-    <div class="admin-toolbar">
-      <button class="btn btn-primary" id="newPostBtn">+ 新建文章</button>
-    </div>
-
-    <div class="post-editor" id="postEditor" style="display:none">
-      <input type="text" class="input" id="postTitle" placeholder="文章标题">
-      <input type="text" class="input" id="postTags" placeholder="标签（逗号分隔）">
-      <textarea class="textarea" id="postContent" placeholder="Markdown 内容..." rows="12"></textarea>
-      <input type="text" class="input" id="postExcerpt" placeholder="摘要（可选）">
-      <input type="hidden" id="editPostId" value="">
-      <div class="editor-actions">
-        <button class="btn btn-primary" id="savePostBtn">保存</button>
-        <button class="btn btn-ghost" id="cancelPostBtn">取消</button>
-      </div>
-    </div>
-
-    <div class="admin-table-wrap">
-      <table class="admin-table" id="postsTable">
-        <thead>
-          <tr>
-            <th>标题</th>
-            <th>标签</th>
-            <th>日期</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% posts.forEach(p => { %>
-          <tr data-id="<%= p.id %>" data-slug="<%= p.slug %>">
-            <td><strong><%= p.title %></strong></td>
-            <td><%= p.tags %></td>
-            <td><%= new Date(p.created_at).toLocaleDateString('zh-CN') %></td>
-            <td class="action-cell">
-              <button class="btn btn-sm btn-ghost edit-post-btn">编辑</button>
-              <button class="btn btn-sm btn-danger del-post-btn">删除</button>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
+  <div class="post-editor" id="postEditor" style="display:none">
+    <input type="text" class="input" id="postTitle" placeholder="文章标题">
+    <input type="text" class="input" id="postTags" placeholder="标签（逗号分隔）">
+    <textarea class="textarea" id="postContent" placeholder="Markdown 内容..." rows="12"></textarea>
+    <input type="text" class="input" id="postExcerpt" placeholder="摘要（可选）">
+    <input type="hidden" id="editPostId" value="">
+    <div class="editor-actions">
+      <button class="btn btn-primary" id="savePostBtn">保存</button>
+      <button class="btn btn-ghost" id="cancelPostBtn">取消</button>
     </div>
   </div>
 
-  <!-- Todos Panel -->
-  <div class="admin-panel" data-panel="todos">
-    <div class="admin-toolbar">
-      <div class="todo-form-inline">
-        <select class="input input-sm" id="todoSubject">
-          <option value="数学">数学</option>
-          <option value="英语">英语</option>
-          <option value="政治">政治</option>
-          <option value="专业课">专业课</option>
-          <option value="其他">其他</option>
-        </select>
-        <input type="text" class="input input-sm" id="todoTask" placeholder="任务内容">
-        <input type="date" class="input input-sm" id="todoDate">
-        <button class="btn btn-primary btn-sm" id="addTodoBtn">添加</button>
-      </div>
-    </div>
-    <div class="admin-table-wrap">
-      <table class="admin-table" id="todosTable">
-        <thead>
-          <tr>
-            <th>状态</th>
-            <th>科目</th>
-            <th>任务</th>
-            <th>截止</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% todos.forEach(t => { %>
-          <tr data-id="<%= t.id %>" class="<%= t.completed ? 'todo-done' : '' %>">
-            <td><input type="checkbox" class="todo-check" <%= t.completed ? 'checked' : '' %>></td>
-            <td><span class="badge"><%= t.subject %></span></td>
-            <td><%= t.task %></td>
-            <td><%= t.due_date || '-' %></td>
-            <td><button class="btn btn-sm btn-danger del-todo-btn">删除</button></td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Milestones Panel -->
-  <div class="admin-panel" data-panel="milestones">
-    <div class="admin-toolbar">
-      <div class="todo-form-inline">
-        <input type="text" class="input input-sm" id="milestoneTitle" placeholder="进度名称">
-        <input type="number" class="input input-sm" id="milestoneTarget" placeholder="目标值" value="100" style="width:80px">
-        <input type="color" class="input input-sm" id="milestoneColor" value="#b5343a" style="width:48px;padding:4px;height:38px">
-        <button class="btn btn-primary btn-sm" id="addMilestoneBtn">添加</button>
-      </div>
-    </div>
-    <div class="admin-table-wrap">
-      <table class="admin-table" id="milestonesTable">
-        <thead>
-          <tr>
-            <th>名称</th>
-            <th>进度</th>
-            <th>目标</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% milestones.forEach(m => { %>
-          <tr data-id="<%= m.id %>">
-            <td><strong><%= m.title %></strong></td>
-            <td>
-              <input type="range" class="progress-slider" min="0" max="<%= m.target %>" value="<%= m.progress %>" data-id="<%= m.id %>">
-              <span class="progress-val"><%= m.progress %>%</span>
-            </td>
-            <td><%= m.target %></td>
-            <td><button class="btn btn-sm btn-danger del-milestone-btn">删除</button></td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    </div>
+  <div class="admin-table-wrap">
+    <table class="admin-table" id="postsTable">
+      <thead>
+        <tr>
+          <th>标题</th>
+          <th>标签</th>
+          <th>日期</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% posts.forEach(p => { %>
+        <tr data-id="<%= p.id %>" data-slug="<%= p.slug %>">
+          <td><strong><%= p.title %></strong></td>
+          <td><%= p.tags %></td>
+          <td><%= new Date(p.created_at).toLocaleDateString('zh-CN') %></td>
+          <td class="action-cell">
+            <button class="btn btn-sm btn-ghost edit-post-btn">编辑</button>
+            <button class="btn btn-sm btn-danger del-post-btn">删除</button>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
   </div>
 </div>
 

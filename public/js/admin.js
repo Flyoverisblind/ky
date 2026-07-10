@@ -1,37 +1,12 @@
 /* ========================================
    Kyai — Admin Panel JS
-   CRUD for Posts, Todos, Milestones
+   CRUD for Posts
    ======================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  initTabs();
   initPostEditor();
-  initTodoManager();
-  initMilestoneManager();
   initAdminAnimations();
 });
-
-// ─── Tab Switching ──────────────────────────────────
-function initTabs() {
-  document.querySelectorAll('.admin-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      const panel = document.querySelector(`[data-panel="${tab.dataset.tab}"]`);
-      if (panel) {
-        panel.classList.add('active');
-        anime({
-          targets: panel,
-          translateY: [10, 0],
-          opacity: [0, 1],
-          duration: 400,
-          easing: 'easeOutExpo',
-        });
-      }
-    });
-  });
-}
 
 // ─── Post Editor ────────────────────────────────────
 function initPostEditor() {
@@ -91,13 +66,7 @@ function initPostEditor() {
       return;
     }
 
-    const body = {
-      title,
-      content,
-      tags: tagsInput.value.trim(),
-      excerpt: excerptInput.value.trim(),
-    };
-
+    const body = { title, content, tags: tagsInput.value.trim(), excerpt: excerptInput.value.trim() };
     const id = editIdInput.value;
     const method = id ? 'PUT' : 'POST';
     const url = id ? `/api/posts/${id}` : '/api/posts';
@@ -154,164 +123,6 @@ function initPostEditor() {
         }
       } catch (err) {
         console.error('Delete post failed:', err);
-      }
-    });
-  });
-}
-
-// ─── Todo Manager ───────────────────────────────────
-function initTodoManager() {
-  const addBtn = document.getElementById('addTodoBtn');
-  const subjectSelect = document.getElementById('todoSubject');
-  const taskInput = document.getElementById('todoTask');
-  const dateInput = document.getElementById('todoDate');
-
-  addBtn?.addEventListener('click', async () => {
-    const subject = subjectSelect.value;
-    const task = taskInput.value.trim();
-    if (!task) { shakeElement(taskInput); return; }
-
-    try {
-      const res = await fetch('/api/todos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, task, due_date: dateInput.value || null }),
-      });
-      if (res.ok) {
-        taskInput.value = '';
-        location.reload();
-      }
-    } catch (err) {
-      console.error('Add todo failed:', err);
-    }
-  });
-
-  // Checkbox toggle
-  document.querySelectorAll('.todo-check').forEach(cb => {
-    cb.addEventListener('change', async () => {
-      const row = cb.closest('tr');
-      const id = row.dataset.id;
-      try {
-        const res = await fetch(`/api/todos/${id}/toggle`, { method: 'PATCH' });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.completed) {
-            row.classList.add('todo-done');
-          } else {
-            row.classList.remove('todo-done');
-          }
-        }
-      } catch (err) {
-        console.error('Toggle todo failed:', err);
-      }
-    });
-  });
-
-  // Delete todo
-  document.querySelectorAll('.del-todo-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const row = btn.closest('tr');
-      const id = row.dataset.id;
-      try {
-        const res = await fetch(`/api/todos/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-          anime({
-            targets: row,
-            translateX: [0, 50],
-            opacity: [1, 0],
-            duration: 400,
-            easing: 'easeInExpo',
-            complete: () => row.remove(),
-          });
-        }
-      } catch (err) {
-        console.error('Delete todo failed:', err);
-      }
-    });
-  });
-
-  // Enter key to add todo
-  taskInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') addBtn?.click();
-  });
-}
-
-// ─── Milestone Manager ──────────────────────────────
-function initMilestoneManager() {
-  const addBtn = document.getElementById('addMilestoneBtn');
-  const titleInput = document.getElementById('milestoneTitle');
-  const targetInput = document.getElementById('milestoneTarget');
-  const colorInput = document.getElementById('milestoneColor');
-
-  // Add milestone
-  addBtn?.addEventListener('click', async () => {
-    const title = titleInput.value.trim();
-    if (!title) { shakeElement(titleInput); return; }
-    try {
-      const res = await fetch('/api/milestones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          target: parseInt(targetInput.value) || 100,
-          color: colorInput.value || '#00f0ff',
-        }),
-      });
-      if (res.ok) {
-        titleInput.value = '';
-        location.reload();
-      }
-    } catch (err) {
-      console.error('Add milestone failed:', err);
-    }
-  });
-
-  titleInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') addBtn?.click();
-  });
-
-  // Progress slider
-  document.querySelectorAll('.progress-slider').forEach(slider => {
-    slider.addEventListener('input', () => {
-      const valEl = slider.nextElementSibling;
-      if (valEl) valEl.textContent = slider.value + '%';
-    });
-
-    slider.addEventListener('change', async () => {
-      const id = slider.dataset.id;
-      const progress = parseInt(slider.value);
-      try {
-        await fetch(`/api/milestones/${id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ progress }),
-        });
-      } catch (err) {
-        console.error('Update milestone failed:', err);
-      }
-    });
-  });
-
-  // Delete milestone
-  document.querySelectorAll('.del-milestone-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if (!confirm('确定删除这个进度？')) return;
-      const row = btn.closest('tr');
-      const id = row.dataset.id;
-      try {
-        const res = await fetch(`/api/milestones/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-          anime({
-            targets: row,
-            translateX: [0, 50],
-            opacity: [1, 0],
-            duration: 400,
-            easing: 'easeInExpo',
-            complete: () => row.remove(),
-          });
-        }
-      } catch (err) {
-        console.error('Delete milestone failed:', err);
       }
     });
   });
